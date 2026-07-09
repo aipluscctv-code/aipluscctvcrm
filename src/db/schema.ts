@@ -51,6 +51,7 @@ export const jobs = pgTable("jobs", {
     .references(() => customers.id, { onDelete: "cascade" }),
   quoteId: uuid("quote_id").references(() => quotes.id, { onDelete: "set null" }),
   installDate: date("install_date"),
+  notes: text("notes"),
   photoUrls: jsonb("photo_urls").notNull().default([]),
   photoExpiresAt: timestamp("photo_expires_at", { withTimezone: true }),
   generatedContent: jsonb("generated_content"),
