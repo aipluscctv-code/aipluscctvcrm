@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -15,7 +16,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="text-xl font-semibold">AI Plus CCTV CRM</h1>
+      <Image src="/logo.png" alt="AI Plus CCTV" width={211} height={57} priority className="h-14 w-auto" />
       <button
         onClick={handleGoogleLogin}
         className="rounded-md bg-black px-4 py-2 text-white"

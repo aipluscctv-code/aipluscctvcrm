@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./actions";
 
@@ -24,8 +25,8 @@ export default async function DashboardLayout({
       <header className="border-b border-black/10 dark:border-white/15">
         <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-6">
-            <Link href="/customers" className="font-semibold">
-              AI Plus CCTV CRM
+            <Link href="/customers" className="flex items-center">
+              <Image src="/logo.png" alt="AI Plus CCTV" width={141} height={38} priority className="h-8 w-auto" />
             </Link>
             <nav className="flex items-center gap-4 text-sm">
               {NAV_ITEMS.map((item) => (
