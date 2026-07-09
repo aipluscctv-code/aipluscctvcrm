@@ -12,7 +12,7 @@ function isAllowedEmail(email: string | undefined) {
   return allowList.includes(email.toLowerCase());
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
