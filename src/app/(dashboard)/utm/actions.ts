@@ -46,15 +46,19 @@ export async function createShortLink(formData: FormData) {
     createdAt,
   });
 
-  await appendShortLinkRecord({
-    code,
-    channelLabel,
-    utmSource,
-    utmMedium,
-    utmCampaign,
-    destinationUrl,
-    createdAt,
-  });
+  try {
+    await appendShortLinkRecord({
+      code,
+      channelLabel,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      destinationUrl,
+      createdAt,
+    });
+  } catch (err) {
+    console.error("Failed to append short link to Google Sheet", err);
+  }
 
   revalidatePath("/utm");
 }
