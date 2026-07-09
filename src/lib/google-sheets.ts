@@ -1,9 +1,18 @@
 import { google } from "googleapis";
 
+function normalizePrivateKey(raw: string | undefined) {
+  if (!raw) return undefined;
+  let key = raw.trim();
+  if (key.startsWith('"') && key.endsWith('"')) {
+    key = key.slice(1, -1);
+  }
+  return key.replace(/\\n/g, "\n");
+}
+
 export function getSheetsClient() {
   const auth = new google.auth.JWT({
-    email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim(),
+    key: normalizePrivateKey(process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY),
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
   return google.sheets({ version: "v4", auth });

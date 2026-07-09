@@ -2,13 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./actions";
-
-const NAV_ITEMS = [
-  { href: "/customers", label: "고객" },
-  { href: "/quotes", label: "견적서" },
-  { href: "/jobs", label: "시공사진" },
-  { href: "/ledger", label: "장부" },
-];
+import { NavLinks } from "./NavLinks";
 
 export default async function DashboardLayout({
   children,
@@ -28,17 +22,7 @@ export default async function DashboardLayout({
             <Link href="/customers" className="flex items-center">
               <Image src="/logo.png" alt="AI Plus CCTV" width={141} height={38} priority className="h-8 w-auto" />
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+            <NavLinks />
           </div>
           <div className="flex items-center gap-3 text-sm text-gray-500">
             <span>{user?.email}</span>
