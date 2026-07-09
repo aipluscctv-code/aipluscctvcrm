@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/quotes", label: "견적서" },
   { href: "/jobs", label: "시공사진" },
   { href: "/ledger", label: "장부" },
+  { href: "/utm", label: "UTM 분석" },
 ];
 
 export function NavLinks() {

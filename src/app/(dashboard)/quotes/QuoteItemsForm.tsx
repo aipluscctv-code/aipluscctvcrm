@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { computeTotals, itemAmount, type QuoteItem } from "@/lib/quote";
 import { inputClass, labelClass, buttonPrimaryClass, buttonSecondaryClass } from "@/lib/ui";
+import { SubmitButton } from "@/components/SubmitButton";
 
 const EMPTY_ITEM: QuoteItem = { name: "", model: "", spec: "", qty: 1, unitPrice: 0 };
 
@@ -141,9 +142,9 @@ export function QuoteItemsForm({
         </div>
       </div>
 
-      <button type="submit" className={buttonPrimaryClass + " self-start"}>
+      <SubmitButton pendingText="저장 중..." className={buttonPrimaryClass + " self-start"}>
         견적서 저장
-      </button>
+      </SubmitButton>
     </form>
   );
 }

@@ -1,6 +1,7 @@
-import { inputClass, labelClass, buttonPrimaryClass, buttonSecondaryClass } from "@/lib/ui";
+import { inputClass, labelClass, buttonSecondaryClass } from "@/lib/ui";
 import Link from "next/link";
 import type { customers } from "@/db/schema";
+import { SubmitButton } from "@/components/SubmitButton";
 
 const STATUS_OPTIONS = ["신규", "견적", "계약", "시공완료", "AS"] as const;
 
@@ -71,9 +72,7 @@ export function CustomerForm({
         />
       </div>
       <div className="flex gap-2">
-        <button type="submit" className={buttonPrimaryClass}>
-          저장
-        </button>
+        <SubmitButton pendingText="저장 중...">저장</SubmitButton>
         <Link href="/customers" className={buttonSecondaryClass}>
           취소
         </Link>

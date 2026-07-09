@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/auth/callback", "/unauthorized", "/api/cron"];
+const PUBLIC_PATHS = ["/login", "/auth/callback", "/unauthorized", "/api/cron", "/r/"];
 
 function isAllowedEmail(email: string | undefined) {
   if (!email) return false;
@@ -13,6 +13,12 @@ function isAllowedEmail(email: string | undefined) {
 }
 
 export async function proxy(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+  const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
+  if (isPublic) {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -38,16 +44,13 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
-  const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
-
-  if (!user && !isPublic) {
+  if (!user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && !isAllowedEmail(user.email) && path !== "/unauthorized") {
+  if (!isAllowedEmail(user.email)) {
     await supabase.auth.signOut();
     const url = request.nextUrl.clone();
     url.pathname = "/unauthorized";

@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { customers } from "@/db/schema";
 import { createJob } from "../actions";
 import { inputClass, labelClass, buttonPrimaryClass } from "@/lib/ui";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function NewJobPage() {
   const customerOptions = await db
@@ -53,9 +54,9 @@ export default async function NewJobPage() {
             className={inputClass}
           />
         </div>
-        <button type="submit" className={buttonPrimaryClass + " self-start"}>
+        <SubmitButton pendingText="콘텐츠 생성 중... (최대 1분 소요)" className={buttonPrimaryClass + " self-start"}>
           콘텐츠 생성
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );
