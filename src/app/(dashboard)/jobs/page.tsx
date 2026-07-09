@@ -20,18 +20,18 @@ export default async function JobsPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">시공 사진 → SNS 콘텐츠</h1>
+        <h1 className="text-lg font-semibold text-ink">시공 사진 → SNS 콘텐츠</h1>
         <Link href="/jobs/new" className={buttonPrimaryClass}>
           + 새 시공 건 등록
         </Link>
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-sm text-gray-500">아직 등록된 시공 건이 없습니다.</p>
+        <p className="text-sm text-muted">아직 등록된 시공 건이 없습니다.</p>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-black/10 dark:border-white/15">
+        <div className="overflow-x-auto rounded-2xl border border-hairline">
           <table className="w-full text-sm">
-            <thead className="bg-black/5 dark:bg-white/10 text-left">
+            <thead className="bg-surface-card text-left">
               <tr>
                 <th className="px-3 py-2">고객</th>
                 <th className="px-3 py-2">시공일</th>
@@ -41,10 +41,7 @@ export default async function JobsPage() {
             </thead>
             <tbody>
               {rows.map((j) => (
-                <tr
-                  key={j.id}
-                  className="border-t border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5"
-                >
+                <tr key={j.id} className="border-t border-hairline hover:bg-surface-soft">
                   <td className="px-3 py-2">
                     <Link href={`/jobs/${j.id}`} className="underline font-medium">
                       {j.customerName}
@@ -52,7 +49,7 @@ export default async function JobsPage() {
                   </td>
                   <td className="px-3 py-2">{j.installDate ?? "-"}</td>
                   <td className="px-3 py-2">{j.status}</td>
-                  <td className="px-3 py-2 text-gray-500">
+                  <td className="px-3 py-2 text-muted">
                     {j.createdAt.toISOString().slice(0, 10)}
                   </td>
                 </tr>

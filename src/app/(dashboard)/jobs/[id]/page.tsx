@@ -56,8 +56,8 @@ export default async function JobDetailPage({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">{customer.name} 시공 건</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-lg font-semibold text-ink">{customer.name} 시공 건</h1>
+          <p className="text-sm text-muted">
             {job.installDate ?? "시공일 미기재"} · 상태: {job.status}
           </p>
         </div>
@@ -68,7 +68,7 @@ export default async function JobDetailPage({
         </form>
       </div>
 
-      {job.notes && <p className="text-sm text-gray-600 dark:text-gray-300">{job.notes}</p>}
+      {job.notes && <p className="text-sm text-body">{job.notes}</p>}
 
       {photoUrls.length > 0 && (
         <div className="flex gap-2 flex-wrap">
@@ -79,14 +79,14 @@ export default async function JobDetailPage({
                 key={i}
                 src={url}
                 alt={`시공 사진 ${i + 1}`}
-                className="h-32 w-32 object-cover rounded-md border border-black/10 dark:border-white/15"
+                className="h-32 w-32 object-cover rounded-xl border border-hairline"
               />
             ) : null,
           )}
         </div>
       )}
       {photoPaths.length === 0 && (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           사진 보관 기간(3개월)이 지나 원본 사진은 삭제되었습니다. 아래 생성된 문구는 계속
           보관됩니다.
         </p>
@@ -110,7 +110,7 @@ export default async function JobDetailPage({
       )}
 
       {job.status === "실패" && (
-        <div className="flex flex-col gap-2 rounded-md border border-red-400/50 bg-red-400/10 p-3 text-sm">
+        <div className="flex flex-col gap-2 rounded-2xl border border-error/30 bg-error/10 p-3 text-sm">
           <p>콘텐츠 생성에 실패했습니다.</p>
           <form action={regenerate}>
             <button type="submit" className={buttonPrimaryClass}>

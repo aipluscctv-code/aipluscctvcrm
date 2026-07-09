@@ -37,13 +37,13 @@ export default async function QuoteDetailPage({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">
+          <h1 className="text-lg font-semibold text-ink">
             <Link href={`/customers/${customer.id}`} className="underline">
               {customer.name}
             </Link>{" "}
             견적서
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted">
             {quote.createdAt.toISOString().slice(0, 10)} 작성
           </p>
         </div>
@@ -60,7 +60,7 @@ export default async function QuoteDetailPage({
       </div>
 
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-gray-500">상태:</span>
+        <span className="text-muted">상태:</span>
         {STATUS_OPTIONS.map((s) => (
           <form key={s} action={setStatus.bind(null, s)}>
             <button
@@ -77,9 +77,9 @@ export default async function QuoteDetailPage({
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-md border border-black/10 dark:border-white/15">
+      <div className="overflow-x-auto rounded-2xl border border-hairline">
         <table className="w-full text-sm">
-          <thead className="bg-black/5 dark:bg-white/10 text-left">
+          <thead className="bg-surface-card text-left">
             <tr>
               <th className="px-3 py-2">품명</th>
               <th className="px-3 py-2">모델명</th>
@@ -91,7 +91,7 @@ export default async function QuoteDetailPage({
           </thead>
           <tbody>
             {items.map((item, i) => (
-              <tr key={i} className="border-t border-black/10 dark:border-white/10">
+              <tr key={i} className="border-t border-hairline">
                 <td className="px-3 py-2">{item.name}</td>
                 <td className="px-3 py-2">{item.model}</td>
                 <td className="px-3 py-2">{item.spec}</td>
@@ -106,11 +106,11 @@ export default async function QuoteDetailPage({
 
       <div className="max-w-xs ml-auto flex flex-col gap-1 text-sm">
         <div className="flex justify-between">
-          <span className="text-gray-500">공급가액</span>
+          <span className="text-muted">공급가액</span>
           <span>{quote.subtotal.toLocaleString()}원</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-500">부가세(10%)</span>
+          <span className="text-muted">부가세(10%)</span>
           <span>{quote.vat.toLocaleString()}원</span>
         </div>
         <div className="flex justify-between font-semibold text-base">

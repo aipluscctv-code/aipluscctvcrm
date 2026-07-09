@@ -49,9 +49,9 @@ export function QuoteItemsForm({
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-md border border-black/10 dark:border-white/15">
+      <div className="overflow-x-auto rounded-2xl border border-hairline">
         <table className="w-full text-sm">
-          <thead className="bg-black/5 dark:bg-white/10 text-left">
+          <thead className="bg-surface-card text-left">
             <tr>
               <th className="px-2 py-2">품명</th>
               <th className="px-2 py-2">모델명</th>
@@ -64,7 +64,7 @@ export function QuoteItemsForm({
           </thead>
           <tbody>
             {items.map((item, i) => (
-              <tr key={i} className="border-t border-black/10 dark:border-white/10">
+              <tr key={i} className="border-t border-hairline">
                 <td className="px-2 py-1">
                   <input
                     className={inputClass}
@@ -111,7 +111,7 @@ export function QuoteItemsForm({
                   <button
                     type="button"
                     onClick={() => removeRow(i)}
-                    className="text-gray-400 hover:text-red-500"
+                    className="text-muted-soft hover:text-error"
                     aria-label="행 삭제"
                   >
                     ✕
@@ -129,11 +129,11 @@ export function QuoteItemsForm({
 
       <div className="max-w-xs ml-auto flex flex-col gap-1 text-sm">
         <div className="flex justify-between">
-          <span className="text-gray-500">공급가액</span>
+          <span className="text-muted">공급가액</span>
           <span>{subtotal.toLocaleString()}원</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-500">부가세(10%)</span>
+          <span className="text-muted">부가세(10%)</span>
           <span>{vat.toLocaleString()}원</span>
         </div>
         <div className="flex justify-between font-semibold text-base">

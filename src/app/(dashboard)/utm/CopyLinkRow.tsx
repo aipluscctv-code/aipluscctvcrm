@@ -21,17 +21,17 @@ export function CopyLinkRow({
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md border border-black/10 dark:border-white/15 px-3 py-2 text-sm">
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-hairline px-3 py-2 text-sm">
       <div className="min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-mono">{shortUrl}</span>
+          <span className="font-mono text-ink">{shortUrl}</span>
           {link.channelLabel && (
-            <span className="rounded bg-black/5 dark:bg-white/10 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-300">
+            <span className="rounded-full bg-surface-card px-2 py-0.5 text-xs text-body">
               {link.channelLabel}
             </span>
           )}
         </div>
-        <div className="truncate text-xs text-gray-500 mt-0.5">{link.destinationUrl}</div>
+        <div className="truncate text-xs text-muted mt-0.5">{link.destinationUrl}</div>
       </div>
       <button
         type="button"

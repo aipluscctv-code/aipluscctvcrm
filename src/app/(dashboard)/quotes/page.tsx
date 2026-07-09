@@ -28,11 +28,11 @@ export default async function QuotesPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-lg font-semibold">견적서</h1>
+      <h1 className="text-lg font-semibold text-ink">견적서</h1>
 
       {followUps.length > 0 && (
-        <div className="rounded-md border border-amber-400/50 bg-amber-400/10 px-3 py-2 text-sm">
-          <p className="font-medium mb-1">⚠ 팔로업 필요 ({followUps.length}건)</p>
+        <div className="rounded-2xl bg-brand-ochre px-4 py-3 text-sm text-ink">
+          <p className="font-semibold mb-1">⚠ 팔로업 필요 ({followUps.length}건)</p>
           <ul className="flex flex-col gap-0.5">
             {followUps.map((q) => (
               <li key={q.id}>
@@ -46,11 +46,11 @@ export default async function QuotesPage() {
       )}
 
       {rows.length === 0 ? (
-        <p className="text-sm text-gray-500">아직 견적서가 없습니다. 고객 상세 페이지에서 만들어보세요.</p>
+        <p className="text-sm text-muted">아직 견적서가 없습니다. 고객 상세 페이지에서 만들어보세요.</p>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-black/10 dark:border-white/15">
+        <div className="overflow-x-auto rounded-2xl border border-hairline">
           <table className="w-full text-sm">
-            <thead className="bg-black/5 dark:bg-white/10 text-left">
+            <thead className="bg-surface-card text-left">
               <tr>
                 <th className="px-3 py-2">고객</th>
                 <th className="px-3 py-2">합계금액</th>
@@ -60,10 +60,7 @@ export default async function QuotesPage() {
             </thead>
             <tbody>
               {rows.map((q) => (
-                <tr
-                  key={q.id}
-                  className="border-t border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5"
-                >
+                <tr key={q.id} className="border-t border-hairline hover:bg-surface-soft">
                   <td className="px-3 py-2">
                     <Link href={`/quotes/${q.id}`} className="underline font-medium">
                       {q.customerName}
@@ -73,7 +70,7 @@ export default async function QuotesPage() {
                   <td className="px-3 py-2">
                     {isOverdue(q.status, q.sentAt) ? "미응답 (확인필요)" : q.status}
                   </td>
-                  <td className="px-3 py-2 text-gray-500">
+                  <td className="px-3 py-2 text-muted">
                     {q.createdAt.toISOString().slice(0, 10)}
                   </td>
                 </tr>

@@ -11,8 +11,8 @@ export default async function NewJobPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-lg font-semibold">새 시공 건 등록</h1>
-      <p className="text-sm text-gray-500">
+      <h1 className="text-lg font-semibold text-ink">새 시공 건 등록</h1>
+      <p className="text-sm text-muted">
         사진을 올리면 당근마켓·숨고·네이버 블로그용 문구를 자동으로 만들어드립니다. 최대
         5장까지 업로드 가능합니다.
       </p>

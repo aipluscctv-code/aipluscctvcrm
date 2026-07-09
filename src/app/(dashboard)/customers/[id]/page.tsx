@@ -46,9 +46,9 @@ export default async function CustomerDetailPage({
           </Link>
         </div>
         {customerQuotes.length === 0 ? (
-          <p className="text-sm text-gray-500">아직 견적서가 없습니다.</p>
+          <p className="text-sm text-muted">아직 견적서가 없습니다.</p>
         ) : (
-          <ul className="flex flex-col divide-y divide-black/10 dark:divide-white/10 rounded-md border border-black/10 dark:border-white/15">
+          <ul className="flex flex-col divide-y divide-hairline rounded-2xl border border-hairline">
             {customerQuotes.map((q) => (
               <li key={q.id} className="px-3 py-2 text-sm flex items-center justify-between">
                 <Link href={`/quotes/${q.id}`} className="underline">

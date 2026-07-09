@@ -1,4 +1,5 @@
 import { getLedgerSummary, getRecentLedgerEntries } from "@/lib/google-sheets";
+import { featureCardClasses } from "@/lib/ui";
 
 function currentMonthLabel() {
   const monthNumber = Number(
@@ -9,10 +10,20 @@ function currentMonthLabel() {
   return `${monthNumber}월`;
 }
 
-function SummaryCard({ label, value, suffix = "원" }: { label: string; value: number; suffix?: string }) {
+function SummaryCard({
+  label,
+  value,
+  suffix = "원",
+  colorClass,
+}: {
+  label: string;
+  value: number;
+  suffix?: string;
+  colorClass: string;
+}) {
   return (
-    <div className="rounded-md border border-black/10 dark:border-white/15 px-4 py-3">
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
+    <div className={`rounded-3xl px-4 py-4 ${colorClass}`}>
+      <p className="text-xs opacity-80 mb-1">{label}</p>
       <p className="text-lg font-semibold">
         {value.toLocaleString()}
         {suffix}
@@ -35,9 +46,9 @@ export default async function LedgerPage() {
   if (error) {
     return (
       <div className="flex flex-col gap-2">
-        <h1 className="text-lg font-semibold">장부 대시보드</h1>
-        <p className="text-sm text-red-500">{error}</p>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-lg font-semibold text-ink">장부 대시보드</h1>
+        <p className="text-sm text-error">{error}</p>
+        <p className="text-sm text-muted">
           Google Sheet 공유 설정과 LEDGER_SHEET_ID 값을 확인해주세요.
         </p>
       </div>
@@ -50,56 +61,69 @@ export default async function LedgerPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-lg font-semibold">장부 대시보드</h1>
+      <h1 className="text-lg font-semibold text-ink">장부 대시보드</h1>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <SummaryCard label={`${thisMonth} 매출`} value={current?.revenue ?? 0} />
-        <SummaryCard label={`${thisMonth} 총비용`} value={current?.totalCost ?? 0} />
-        <SummaryCard label={`${thisMonth} 순이익`} value={current?.profit ?? 0} />
+        <SummaryCard
+          label={`${thisMonth} 매출`}
+          value={current?.revenue ?? 0}
+          colorClass={featureCardClasses[0]}
+        />
+        <SummaryCard
+          label={`${thisMonth} 총비용`}
+          value={current?.totalCost ?? 0}
+          colorClass={featureCardClasses[1]}
+        />
+        <SummaryCard
+          label={`${thisMonth} 순이익`}
+          value={current?.profit ?? 0}
+          colorClass={featureCardClasses[2]}
+        />
         <SummaryCard
           label={`${thisMonth} 이익률`}
           value={Math.round((current?.margin ?? 0) * 1000) / 10}
           suffix="%"
+          colorClass={featureCardClasses[3]}
         />
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="font-semibold">월별 매출 vs 비용</h2>
-        <div className="flex flex-col gap-2 rounded-md border border-black/10 dark:border-white/15 p-4">
+        <h2 className="font-semibold text-ink">월별 매출 vs 비용</h2>
+        <div className="flex flex-col gap-2 rounded-2xl border border-hairline p-4">
           {summary.map((s) => (
             <div key={s.month} className="flex items-center gap-3 text-xs">
-              <span className="w-8 text-gray-500">{s.month}</span>
+              <span className="w-8 text-muted">{s.month}</span>
               <div className="flex-1 flex flex-col gap-1">
-                <div className="h-3 bg-black/5 dark:bg-white/10 rounded">
+                <div className="h-3 bg-surface-card rounded-full">
                   <div
-                    className="h-3 rounded bg-emerald-500"
+                    className="h-3 rounded-full bg-brand-mint"
                     style={{ width: `${(s.revenue / maxValue) * 100}%` }}
                   />
                 </div>
-                <div className="h-3 bg-black/5 dark:bg-white/10 rounded">
+                <div className="h-3 bg-surface-card rounded-full">
                   <div
-                    className="h-3 rounded bg-rose-400"
+                    className="h-3 rounded-full bg-brand-coral"
                     style={{ width: `${(s.totalCost / maxValue) * 100}%` }}
                   />
                 </div>
               </div>
-              <span className="w-24 text-right text-gray-500">
+              <span className="w-24 text-right text-muted">
                 {s.revenue.toLocaleString()} / {s.totalCost.toLocaleString()}
               </span>
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-500">
-          <span className="text-emerald-500">■</span> 매출 &nbsp;
-          <span className="text-rose-400">■</span> 비용
+        <p className="text-xs text-muted">
+          <span className="text-brand-mint">■</span> 매출 &nbsp;
+          <span className="text-brand-coral">■</span> 비용
         </p>
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="font-semibold">최근 거래 내역</h2>
-        <div className="overflow-x-auto rounded-md border border-black/10 dark:border-white/15">
+        <h2 className="font-semibold text-ink">최근 거래 내역</h2>
+        <div className="overflow-x-auto rounded-2xl border border-hairline">
           <table className="w-full text-sm">
-            <thead className="bg-black/5 dark:bg-white/10 text-left">
+            <thead className="bg-surface-card text-left">
               <tr>
                 <th className="px-3 py-2">날짜</th>
                 <th className="px-3 py-2">유형</th>
@@ -110,8 +134,8 @@ export default async function LedgerPage() {
             </thead>
             <tbody>
               {recentEntries.map((e, i) => (
-                <tr key={i} className="border-t border-black/10 dark:border-white/10">
-                  <td className="px-3 py-2 text-gray-500">{e.date}</td>
+                <tr key={i} className="border-t border-hairline">
+                  <td className="px-3 py-2 text-muted">{e.date}</td>
                   <td className="px-3 py-2">{e.type}</td>
                   <td className="px-3 py-2">{e.counterparty}</td>
                   <td className="px-3 py-2">{e.item}</td>
@@ -121,7 +145,7 @@ export default async function LedgerPage() {
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted">
           장부는 Google Sheet에서 직접 관리하세요. 이 화면은 조회 전용입니다.
         </p>
       </div>

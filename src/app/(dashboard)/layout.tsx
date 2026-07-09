@@ -16,7 +16,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-full flex flex-col">
-      <header className="border-b border-black/10 dark:border-white/15">
+      <header className="bg-canvas border-b border-hairline">
         <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-6">
             <Link href="/customers" className="flex items-center">
@@ -24,17 +24,17 @@ export default async function DashboardLayout({
             </Link>
             <NavLinks />
           </div>
-          <div className="flex items-center gap-3 text-sm text-gray-500">
+          <div className="flex items-center gap-3 text-sm text-muted">
             <span>{user?.email}</span>
             <form action={signOut}>
-              <button type="submit" className="underline hover:text-black dark:hover:text-white">
+              <button type="submit" className="underline hover:text-ink">
                 로그아웃
               </button>
             </form>
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 bg-canvas">{children}</main>
     </div>
   );
 }
