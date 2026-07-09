@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/auth/callback", "/unauthorized"];
+const PUBLIC_PATHS = ["/login", "/auth/callback", "/unauthorized", "/api/cron"];
 
 function isAllowedEmail(email: string | undefined) {
   if (!email) return false;
