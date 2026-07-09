@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { getSheetsClient } from "@/lib/google-sheets";
 
 export async function GET(request: Request) {
@@ -6,9 +7,26 @@ export async function GET(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const result: { ledgerSheet: string; utmSheet: string } = {
+  const rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ?? "";
+  const keyFingerprint = {
+    length: rawKey.length,
+    sha256_12: createHash("sha256").update(rawKey).digest("hex").slice(0, 12),
+    startsWithQuote: rawKey.startsWith('"'),
+    endsWithQuote: rawKey.endsWith('"'),
+    startsWithBeginMarker: rawKey.trim().replace(/^"/, "").startsWith("-----BEGIN PRIVATE KEY-----"),
+    endsWithEndMarker: rawKey
+      .trim()
+      .replace(/"$/, "")
+      .trim()
+      .endsWith("-----END PRIVATE KEY-----"),
+    containsLiteralBackslashN: rawKey.includes("\\n"),
+    containsRealNewline: rawKey.includes("\n"),
+  };
+
+  const result: { ledgerSheet: string; utmSheet: string; keyFingerprint: typeof keyFingerprint } = {
     ledgerSheet: "unknown",
     utmSheet: "unknown",
+    keyFingerprint,
   };
 
   const sheets = getSheetsClient();
