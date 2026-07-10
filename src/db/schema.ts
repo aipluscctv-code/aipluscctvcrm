@@ -1,17 +1,12 @@
 import { pgTable, uuid, text, integer, timestamp, jsonb, pgEnum, date } from "drizzle-orm/pg-core";
 
-export const customerStatusEnum = pgEnum("customer_status", [
-  "신규",
-  "견적",
+export const quoteStatusEnum = pgEnum("quote_status", [
+  "발송후대기",
+  "견적수락",
   "계약",
   "시공완료",
   "AS",
-]);
-
-export const quoteStatusEnum = pgEnum("quote_status", [
-  "발송후대기",
-  "수락",
-  "거절",
+  "거절/드롭",
   "미응답",
 ]);
 
@@ -22,7 +17,6 @@ export const customers = pgTable("customers", {
   address: text("address"),
   serviceArea: text("service_area"),
   channel: text("channel"),
-  status: customerStatusEnum("status").notNull().default("신규"),
   driveLink: text("drive_link"),
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -46,9 +40,7 @@ export const quotes = pgTable("quotes", {
 
 export const jobs = pgTable("jobs", {
   id: uuid("id").primaryKey().defaultRandom(),
-  customerId: uuid("customer_id")
-    .notNull()
-    .references(() => customers.id, { onDelete: "cascade" }),
+  customerName: text("customer_name").notNull(),
   quoteId: uuid("quote_id").references(() => quotes.id, { onDelete: "set null" }),
   installDate: date("install_date"),
   notes: text("notes"),

@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { jobs, customers } from "@/db/schema";
+import { jobs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -14,23 +14,20 @@ const MAX_PHOTOS = 5;
 const RETENTION_DAYS = 90;
 
 export async function createJob(formData: FormData) {
-  const customerId = String(formData.get("customerId") ?? "");
+  const customerName = String(formData.get("customerName") ?? "").trim();
   const installDate = String(formData.get("installDate") ?? "") || null;
   const notes = String(formData.get("notes") ?? "").trim();
   const photos = formData.getAll("photos").filter((f): f is File => f instanceof File && f.size > 0);
 
-  if (!customerId) throw new Error("고객을 선택해주세요");
+  if (!customerName) throw new Error("고객명을 입력해주세요");
   if (photos.length === 0) throw new Error("사진을 1장 이상 올려주세요");
   if (photos.length > MAX_PHOTOS) throw new Error(`사진은 최대 ${MAX_PHOTOS}장까지 가능합니다`);
-
-  const [customer] = await db.select().from(customers).where(eq(customers.id, customerId));
-  if (!customer) throw new Error("고객을 찾을 수 없습니다");
 
   const photoExpiresAt = new Date(Date.now() + RETENTION_DAYS * 24 * 60 * 60 * 1000);
   const [job] = await db
     .insert(jobs)
     .values({
-      customerId,
+      customerName,
       installDate,
       notes,
       photoUrls: [],
@@ -63,7 +60,6 @@ export async function createJob(formData: FormData) {
 
   try {
     const content = await generateJobContent({
-      customerArea: customer.serviceArea,
       jobDescription: notes,
       images: compressedImages.map((i) => ({ base64: i.base64, mediaType: "image/jpeg" })),
     });
@@ -88,7 +84,6 @@ export async function createJob(formData: FormData) {
 export async function regenerateJobContent(jobId: string) {
   const [job] = await db.select().from(jobs).where(eq(jobs.id, jobId));
   if (!job) throw new Error("작업을 찾을 수 없습니다");
-  const [customer] = await db.select().from(customers).where(eq(customers.id, job.customerId));
 
   const supabase = await createClient();
   const paths = job.photoUrls as string[];
@@ -107,7 +102,6 @@ export async function regenerateJobContent(jobId: string) {
 
   try {
     const content = await generateJobContent({
-      customerArea: customer?.serviceArea,
       jobDescription: job.notes ?? "",
       images,
     });

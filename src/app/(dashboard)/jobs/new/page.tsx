@@ -1,14 +1,9 @@
-import { db } from "@/db";
-import { customers } from "@/db/schema";
 import { createJob } from "../actions";
 import { inputClass, labelClass, buttonPrimaryClass } from "@/lib/ui";
 import { SubmitButton } from "@/components/SubmitButton";
+import { PhotoUploadField } from "../PhotoUploadField";
 
-export default async function NewJobPage() {
-  const customerOptions = await db
-    .select({ id: customers.id, name: customers.name })
-    .from(customers);
-
+export default function NewJobPage() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-lg font-semibold text-ink">새 시공 건 등록</h1>
@@ -19,16 +14,7 @@ export default async function NewJobPage() {
       <form action={createJob} className="flex flex-col gap-4 max-w-xl">
         <div>
           <label className={labelClass}>고객 *</label>
-          <select name="customerId" required className={inputClass}>
-            <option value="" disabled selected>
-              고객 선택
-            </option>
-            {customerOptions.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <input name="customerName" required className={inputClass} />
         </div>
         <div>
           <label className={labelClass}>시공일</label>
@@ -45,16 +31,12 @@ export default async function NewJobPage() {
         </div>
         <div>
           <label className={labelClass}>시공 사진 * (최대 5장)</label>
-          <input
-            type="file"
-            name="photos"
-            accept="image/*"
-            multiple
-            required
-            className={inputClass}
-          />
+          <PhotoUploadField name="photos" max={5} />
         </div>
-        <SubmitButton pendingText="콘텐츠 생성 중... (최대 1분 소요)" className={buttonPrimaryClass + " self-start"}>
+        <SubmitButton
+          pendingText="콘텐츠 생성 중... (최대 1분 소요)"
+          className={buttonPrimaryClass + " self-start"}
+        >
           콘텐츠 생성
         </SubmitButton>
       </form>

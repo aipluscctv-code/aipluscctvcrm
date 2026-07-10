@@ -4,12 +4,11 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { QuoteItem } from "@/lib/quote";
-import { itemAmount } from "@/lib/quote";
+import { itemAmount, QUOTE_STATUS_OPTIONS, QUOTE_STATUS_BADGE_CLASS } from "@/lib/quote";
 import { updateQuoteStatus, deleteQuote } from "../actions";
 import { CopyTextBox } from "../CopyTextBox";
-import { buttonPrimaryClass, buttonSecondaryClass } from "@/lib/ui";
-
-const STATUS_OPTIONS = ["발송후대기", "수락", "거절", "미응답"] as const;
+import { buttonSecondaryClass } from "@/lib/ui";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function QuoteDetailPage({
   params,
@@ -52,27 +51,27 @@ export default async function QuoteDetailPage({
             PDF 다운로드
           </a>
           <form action={removeQuote}>
-            <button type="submit" className={buttonSecondaryClass}>
+            <SubmitButton pendingText="삭제 중..." className={buttonSecondaryClass}>
               삭제
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex items-center gap-2 flex-wrap text-sm">
         <span className="text-muted">상태:</span>
-        {STATUS_OPTIONS.map((s) => (
+        {QUOTE_STATUS_OPTIONS.map((s) => (
           <form key={s} action={setStatus.bind(null, s)}>
-            <button
-              type="submit"
+            <SubmitButton
+              pendingText="..."
               className={
                 quote.status === s
-                  ? buttonPrimaryClass + " !px-3 !py-1"
-                  : buttonSecondaryClass + " !px-3 !py-1"
+                  ? `rounded-full px-3 py-1 text-sm font-semibold ${QUOTE_STATUS_BADGE_CLASS[s]}`
+                  : buttonSecondaryClass + " !rounded-full !px-3 !py-1"
               }
             >
               {s}
-            </button>
+            </SubmitButton>
           </form>
         ))}
       </div>

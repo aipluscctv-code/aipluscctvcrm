@@ -3,6 +3,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./actions";
 import { NavLinks } from "./NavLinks";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function DashboardLayout({
   children,
@@ -27,9 +28,9 @@ export default async function DashboardLayout({
           <div className="flex items-center gap-3 text-sm text-muted">
             <span>{user?.email}</span>
             <form action={signOut}>
-              <button type="submit" className="underline hover:text-ink">
+              <SubmitButton pendingText="로그아웃 중..." className="underline hover:text-ink">
                 로그아웃
-              </button>
+              </SubmitButton>
             </form>
           </div>
         </div>

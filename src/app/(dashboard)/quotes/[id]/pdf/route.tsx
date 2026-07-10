@@ -259,9 +259,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
         <View style={styles.notesBox}>
           <Text style={styles.notesTitle}>안내사항</Text>
-          <Text style={styles.noteLine}>· 본 견적은 현장 방문 실측 결과에 따라 변동될 수 있습니다.</Text>
-          <Text style={styles.noteLine}>· 구매 방식으로만 운영되며, 렌탈 상품은 취급하지 않습니다.</Text>
-          <Text style={styles.noteLine}>· 시공 후 1년간 무상 A/S를 제공합니다.</Text>
+          <Text style={styles.noteLine}>
+            *본 견적은 현장 방문 전 견적이며, 현장 확인 후 상황에 따라 변동될 수 있습니다.
+          </Text>
         </View>
 
         <Text style={styles.footer}>

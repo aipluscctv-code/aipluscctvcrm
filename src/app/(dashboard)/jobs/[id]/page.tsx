@@ -1,11 +1,12 @@
 import { db } from "@/db";
-import { jobs, customers } from "@/db/schema";
+import { jobs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CopyTextBox } from "../../quotes/CopyTextBox";
 import { deleteJob, regenerateJobContent } from "../actions";
 import { buttonPrimaryClass, buttonSecondaryClass } from "@/lib/ui";
+import { SubmitButton } from "@/components/SubmitButton";
 import type { ChannelContent } from "@/lib/ai-content";
 
 const BUCKET = "job-photos";
@@ -26,14 +27,9 @@ export default async function JobDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [row] = await db
-    .select({ job: jobs, customer: customers })
-    .from(jobs)
-    .innerJoin(customers, eq(jobs.customerId, customers.id))
-    .where(eq(jobs.id, id));
+  const [job] = await db.select().from(jobs).where(eq(jobs.id, id));
 
-  if (!row) notFound();
-  const { job, customer } = row;
+  if (!job) notFound();
 
   const supabase = await createClient();
   const photoPaths = job.photoUrls as string[];
@@ -56,15 +52,15 @@ export default async function JobDetailPage({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-ink">{customer.name} 시공 건</h1>
+          <h1 className="text-lg font-semibold text-ink">{job.customerName} 시공 건</h1>
           <p className="text-sm text-muted">
             {job.installDate ?? "시공일 미기재"} · 상태: {job.status}
           </p>
         </div>
         <form action={removeJob}>
-          <button type="submit" className={buttonSecondaryClass}>
+          <SubmitButton pendingText="삭제 중..." className={buttonSecondaryClass}>
             삭제
-          </button>
+          </SubmitButton>
         </form>
       </div>
 
@@ -113,9 +109,9 @@ export default async function JobDetailPage({
         <div className="flex flex-col gap-2 rounded-2xl border border-error/30 bg-error/10 p-3 text-sm">
           <p>콘텐츠 생성에 실패했습니다.</p>
           <form action={regenerate}>
-            <button type="submit" className={buttonPrimaryClass}>
+            <SubmitButton pendingText="생성 중... (최대 1분 소요)" className={buttonPrimaryClass}>
               다시 생성
-            </button>
+            </SubmitButton>
           </form>
         </div>
       )}

@@ -13,7 +13,6 @@ function readCustomerForm(formData: FormData) {
     address: String(formData.get("address") ?? "").trim() || null,
     serviceArea: String(formData.get("serviceArea") ?? "").trim() || null,
     channel: String(formData.get("channel") ?? "").trim() || null,
-    status: String(formData.get("status") ?? "신규") as (typeof customers.$inferInsert)["status"],
     driveLink: String(formData.get("driveLink") ?? "").trim() || null,
     notes: String(formData.get("notes") ?? "").trim() || null,
   };

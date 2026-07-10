@@ -1,5 +1,9 @@
 import { getLedgerSummary, getRecentLedgerEntries } from "@/lib/google-sheets";
 import { featureCardClasses } from "@/lib/ui";
+import { Pagination } from "@/components/Pagination";
+import { parsePagination, paginate, type ListSearchParams } from "@/lib/list-query";
+
+const LEDGER_PAGE_SIZE_OPTIONS = [10, 25, 50, 100] as const;
 
 function currentMonthLabel() {
   const monthNumber = Number(
@@ -32,7 +36,12 @@ function SummaryCard({
   );
 }
 
-export default async function LedgerPage() {
+export default async function LedgerPage({
+  searchParams,
+}: {
+  searchParams: Promise<ListSearchParams>;
+}) {
+  const params = await searchParams;
   let summary: Awaited<ReturnType<typeof getLedgerSummary>> = [];
   let recentEntries: Awaited<ReturnType<typeof getRecentLedgerEntries>> = [];
   let error: string | null = null;
@@ -58,6 +67,9 @@ export default async function LedgerPage() {
   const thisMonth = currentMonthLabel();
   const current = summary.find((s) => s.month === thisMonth);
   const maxValue = Math.max(1, ...summary.map((s) => Math.max(s.revenue, s.totalCost)));
+
+  const { page, pageSize } = parsePagination(params, LEDGER_PAGE_SIZE_OPTIONS);
+  const { pageRows, totalPages } = paginate(recentEntries, page, pageSize);
 
   return (
     <div className="flex flex-col gap-8">
@@ -133,7 +145,7 @@ export default async function LedgerPage() {
               </tr>
             </thead>
             <tbody>
-              {recentEntries.map((e, i) => (
+              {pageRows.map((e, i) => (
                 <tr key={i} className="border-t border-hairline">
                   <td className="px-3 py-2 text-muted">{e.date}</td>
                   <td className="px-3 py-2">{e.type}</td>
@@ -145,6 +157,16 @@ export default async function LedgerPage() {
             </tbody>
           </table>
         </div>
+        {recentEntries.length > 0 && (
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            basePath="/ledger"
+            searchParams={params}
+            pageSizeOptions={LEDGER_PAGE_SIZE_OPTIONS}
+          />
+        )}
         <p className="text-xs text-muted">
           장부는 Google Sheet에서 직접 관리하세요. 이 화면은 조회 전용입니다.
         </p>

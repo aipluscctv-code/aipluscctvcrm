@@ -3,8 +3,6 @@ import Link from "next/link";
 import type { customers } from "@/db/schema";
 import { SubmitButton } from "@/components/SubmitButton";
 
-const STATUS_OPTIONS = ["신규", "견적", "계약", "시공완료", "AS"] as const;
-
 export function CustomerForm({
   customer,
   action,
@@ -43,20 +41,6 @@ export function CustomerForm({
           placeholder="예: 네이버블로그, 당근마켓, 숨고, 카카오채널"
           className={inputClass}
         />
-      </div>
-      <div>
-        <label className={labelClass}>상태</label>
-        <select
-          name="status"
-          defaultValue={customer?.status ?? "신규"}
-          className={inputClass}
-        >
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
       </div>
       <div>
         <label className={labelClass}>Google Drive 링크 (계약서 등, 선택)</label>

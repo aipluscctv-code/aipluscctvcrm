@@ -159,15 +159,14 @@ export async function appendUtmClick(click: {
   });
 }
 
-export async function getRecentLedgerEntries(limit = 15): Promise<LedgerEntryRow[]> {
+export async function getRecentLedgerEntries(): Promise<LedgerEntryRow[]> {
   const sheets = getSheetsClient();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.LEDGER_SHEET_ID!,
-    range: "거래장부!A4:L499",
+    range: "거래장부!A4:L999",
   });
   const rows = (res.data.values ?? []).filter((r) => r[0]);
   return rows
-    .slice(-limit)
     .reverse()
     .map((r) => ({
       date: String(r[0] ?? ""),

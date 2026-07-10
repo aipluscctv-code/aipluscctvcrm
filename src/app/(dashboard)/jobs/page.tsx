@@ -1,20 +1,19 @@
 import Link from "next/link";
 import { db } from "@/db";
-import { jobs, customers } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { jobs } from "@/db/schema";
+import { desc } from "drizzle-orm";
 import { buttonPrimaryClass } from "@/lib/ui";
 
 export default async function JobsPage() {
   const rows = await db
     .select({
       id: jobs.id,
-      customerName: customers.name,
+      customerName: jobs.customerName,
       installDate: jobs.installDate,
       status: jobs.status,
       createdAt: jobs.createdAt,
     })
     .from(jobs)
-    .innerJoin(customers, eq(jobs.customerId, customers.id))
     .orderBy(desc(jobs.createdAt));
 
   return (
