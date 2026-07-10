@@ -66,8 +66,8 @@ export default async function QuoteDetailPage({
               pendingText="..."
               className={
                 quote.status === s
-                  ? `rounded-full px-3 py-1 text-sm font-semibold ${QUOTE_STATUS_BADGE_CLASS[s]}`
-                  : buttonSecondaryClass + " !rounded-full !px-3 !py-1"
+                  ? `rounded-full px-3 py-2 text-sm font-semibold ${QUOTE_STATUS_BADGE_CLASS[s]}`
+                  : buttonSecondaryClass + " !rounded-full !px-3 !py-2"
               }
             >
               {s}

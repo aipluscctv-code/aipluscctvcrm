@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { href: "/customers", label: "고객" },
   { href: "/quotes", label: "견적서" },
   { href: "/jobs", label: "시공사진" },

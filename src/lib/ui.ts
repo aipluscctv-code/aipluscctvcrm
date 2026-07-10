@@ -1,5 +1,5 @@
 export const inputClass =
-  "w-full rounded-xl border border-hairline bg-canvas px-4 py-2.5 text-sm text-ink outline-none focus:border-ink";
+  "w-full rounded-xl border border-hairline bg-canvas px-4 py-2.5 text-sm text-ink outline-none focus:border-ink [@media(pointer:coarse)]:text-base";
 
 export const labelClass = "block text-sm font-medium text-body-strong mb-1";
 

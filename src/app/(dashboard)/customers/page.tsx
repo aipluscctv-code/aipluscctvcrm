@@ -86,7 +86,7 @@ export default async function CustomersPage({
         <p className="text-sm text-muted">조건에 맞는 고객이 없습니다.</p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-2xl border border-hairline">
+          <div className="hidden md:block overflow-x-auto rounded-2xl border border-hairline">
             <table className="w-full text-sm">
               <thead className="bg-surface-card text-left">
                 <tr>
@@ -127,6 +127,33 @@ export default async function CustomersPage({
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="flex flex-col gap-2 md:hidden">
+            {pageRows.map(({ customer: c, latestQuote }) => (
+              <div key={c.id} className="rounded-2xl border border-hairline p-4 flex flex-col gap-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <Link href={`/customers/${c.id}`} className="font-medium underline">
+                      {c.name}
+                    </Link>
+                    <div className="text-sm text-muted">{c.phone ?? "-"}</div>
+                  </div>
+                  <DeleteCustomerButton action={deleteCustomer.bind(null, c.id)} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <StatusBadge status={latestQuote?.status ?? "신규"} />
+                  <span className="text-sm font-medium">
+                    {latestQuote ? `${latestQuote.total.toLocaleString()}원` : "-"}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted">
+                  <span>지역: {c.serviceArea ?? "-"}</span>
+                  <span>채널: {c.channel ?? "-"}</span>
+                  <span>등록일: {c.createdAt.toISOString().slice(0, 10)}</span>
+                </div>
+              </div>
+            ))}
           </div>
 
           <Pagination

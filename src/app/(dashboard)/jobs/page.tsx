@@ -28,34 +28,53 @@ export default async function JobsPage() {
       {rows.length === 0 ? (
         <p className="text-sm text-muted">아직 등록된 시공 건이 없습니다.</p>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-hairline">
-          <table className="w-full text-sm">
-            <thead className="bg-surface-card text-left">
-              <tr>
-                <th className="px-3 py-2">고객</th>
-                <th className="px-3 py-2">시공일</th>
-                <th className="px-3 py-2">상태</th>
-                <th className="px-3 py-2">등록일</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((j) => (
-                <tr key={j.id} className="border-t border-hairline hover:bg-surface-soft">
-                  <td className="px-3 py-2">
-                    <Link href={`/jobs/${j.id}`} className="underline font-medium">
-                      {j.customerName}
-                    </Link>
-                  </td>
-                  <td className="px-3 py-2">{j.installDate ?? "-"}</td>
-                  <td className="px-3 py-2">{j.status}</td>
-                  <td className="px-3 py-2 text-muted">
-                    {j.createdAt.toISOString().slice(0, 10)}
-                  </td>
+        <>
+          <div className="hidden md:block overflow-x-auto rounded-2xl border border-hairline">
+            <table className="w-full text-sm">
+              <thead className="bg-surface-card text-left">
+                <tr>
+                  <th className="px-3 py-2">고객</th>
+                  <th className="px-3 py-2">시공일</th>
+                  <th className="px-3 py-2">상태</th>
+                  <th className="px-3 py-2">등록일</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {rows.map((j) => (
+                  <tr key={j.id} className="border-t border-hairline hover:bg-surface-soft">
+                    <td className="px-3 py-2">
+                      <Link href={`/jobs/${j.id}`} className="underline font-medium">
+                        {j.customerName}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2">{j.installDate ?? "-"}</td>
+                    <td className="px-3 py-2">{j.status}</td>
+                    <td className="px-3 py-2 text-muted">
+                      {j.createdAt.toISOString().slice(0, 10)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex flex-col gap-2 md:hidden">
+            {rows.map((j) => (
+              <Link
+                key={j.id}
+                href={`/jobs/${j.id}`}
+                className="rounded-2xl border border-hairline p-4 flex flex-col gap-1"
+              >
+                <span className="font-medium underline">{j.customerName}</span>
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted">
+                  <span>시공일: {j.installDate ?? "-"}</span>
+                  <span>상태: {j.status}</span>
+                  <span>등록일: {j.createdAt.toISOString().slice(0, 10)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

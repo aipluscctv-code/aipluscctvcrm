@@ -34,8 +34,8 @@ export function Pagination({
             href={hrefFor(p, pageSize)}
             className={
               p === page
-                ? "rounded-full bg-ink text-on-primary px-3 py-1"
-                : "rounded-full px-3 py-1 text-muted hover:text-ink"
+                ? "rounded-full bg-ink text-on-primary px-3 py-2"
+                : "rounded-full px-3 py-2 text-muted hover:text-ink"
             }
           >
             {p}

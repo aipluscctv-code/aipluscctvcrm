@@ -92,7 +92,7 @@ export default async function QuotesPage({
         <p className="text-sm text-muted">조건에 맞는 견적서가 없습니다.</p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-2xl border border-hairline">
+          <div className="hidden md:block overflow-x-auto rounded-2xl border border-hairline">
             <table className="w-full text-sm">
               <thead className="bg-surface-card text-left">
                 <tr>
@@ -125,6 +125,28 @@ export default async function QuotesPage({
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="flex flex-col gap-2 md:hidden">
+            {pageRows.map((q) => (
+              <div key={q.id} className="rounded-2xl border border-hairline p-4 flex flex-col gap-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <Link href={`/quotes/${q.id}`} className="underline font-medium">
+                      {q.customerName}
+                    </Link>
+                    <div className="text-sm text-muted">
+                      {q.createdAt.toISOString().slice(0, 10)}
+                    </div>
+                  </div>
+                  <DeleteQuoteButton action={deleteQuote.bind(null, q.id)} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <StatusBadge status={isOverdue(q.status, q.sentAt) ? "미응답" : q.status} />
+                  <span className="text-sm font-medium">{q.total.toLocaleString()}원</span>
+                </div>
+              </div>
+            ))}
           </div>
 
           <Pagination

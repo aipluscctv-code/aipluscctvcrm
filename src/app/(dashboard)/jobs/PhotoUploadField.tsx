@@ -40,12 +40,15 @@ export function PhotoUploadField({ name, max = 5 }: { name: string; max?: number
           {files.length}/{max}장 선택됨
         </span>
       </div>
+      {/* iOS Safari can refuse to open the file picker on a programmatic .click() when the
+          input is display:none — sr-only keeps it out of view without hiding it from the
+          rendering tree, which is the documented workaround. */}
       <input
         ref={pickerRef}
         type="file"
         accept="image/*"
         multiple
-        className="hidden"
+        className="sr-only"
         onChange={handlePick}
       />
       <input ref={formInputRef} type="file" name={name} multiple required={files.length === 0} className="hidden" />

@@ -19,7 +19,7 @@ export function DeleteCustomerButton({ action }: { action: () => Promise<void> }
       type="button"
       onClick={handleClick}
       disabled={isPending}
-      className="text-muted-soft hover:text-error disabled:opacity-50"
+      className="flex h-11 w-11 items-center justify-center text-muted-soft hover:text-error disabled:opacity-50"
       aria-label="고객 삭제"
     >
       {isPending ? (

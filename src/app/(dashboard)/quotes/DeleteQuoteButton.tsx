@@ -19,7 +19,7 @@ export function DeleteQuoteButton({ action }: { action: () => Promise<void> }) {
       type="button"
       onClick={handleClick}
       disabled={isPending}
-      className="text-muted-soft hover:text-error disabled:opacity-50"
+      className="px-2 py-3 text-muted-soft hover:text-error disabled:opacity-50"
       aria-label="견적서 삭제"
     >
       {isPending ? "삭제 중..." : "삭제"}
