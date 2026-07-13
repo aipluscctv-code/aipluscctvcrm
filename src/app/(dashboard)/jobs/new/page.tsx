@@ -9,7 +9,7 @@ export default function NewJobPage() {
       <h1 className="text-lg font-semibold text-ink">새 시공 건 등록</h1>
       <p className="text-sm text-muted">
         사진을 올리면 당근마켓·숨고·네이버 블로그용 문구를 자동으로 만들어드립니다. 최대
-        5장까지 업로드 가능합니다.
+        15장까지 업로드 가능합니다.
       </p>
       <form action={createJob} className="flex flex-col gap-4 max-w-xl">
         <div>
@@ -30,8 +30,8 @@ export default function NewJobPage() {
           />
         </div>
         <div>
-          <label className={labelClass}>시공 사진 * (최대 5장)</label>
-          <PhotoUploadField name="photos" max={5} />
+          <label className={labelClass}>시공 사진 * (최대 15장)</label>
+          <PhotoUploadField name="photos" max={15} />
         </div>
         <SubmitButton
           pendingText="콘텐츠 생성 중... (최대 1분 소요)"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { computeTotals, itemAmount, type QuoteItem } from "@/lib/quote";
+import { computeTotals, itemAmount, QUOTE_CATALOG, type QuoteItem } from "@/lib/quote";
 import { inputClass, labelClass, buttonPrimaryClass, buttonSecondaryClass } from "@/lib/ui";
 import { SubmitButton } from "@/components/SubmitButton";
 
@@ -17,6 +17,8 @@ export function QuoteItemsForm({
   action: (formData: FormData) => void;
 }) {
   const [items, setItems] = useState<QuoteItem[]>([{ ...EMPTY_ITEM }]);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [recentlyAdded, setRecentlyAdded] = useState<string | null>(null);
   const { subtotal, vat, total } = computeTotals(items);
 
   function updateItem(index: number, patch: Partial<QuoteItem>) {
@@ -29,6 +31,12 @@ export function QuoteItemsForm({
 
   function removeRow(index: number) {
     setItems((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function addFromCatalog(name: string) {
+    setItems((prev) => [...prev, { ...EMPTY_ITEM, name }]);
+    setRecentlyAdded(name);
+    setTimeout(() => setRecentlyAdded((current) => (current === name ? null : current)), 1200);
   }
 
   return (
@@ -123,9 +131,65 @@ export function QuoteItemsForm({
         </table>
       </div>
 
-      <button type="button" onClick={addRow} className={buttonSecondaryClass + " self-start"}>
-        + 품목 추가
-      </button>
+      <div className="flex gap-2">
+        <button type="button" onClick={addRow} className={buttonSecondaryClass}>
+          + 품목 추가
+        </button>
+        <button type="button" onClick={() => setCatalogOpen(true)} className={buttonSecondaryClass}>
+          카탈로그에서 추가
+        </button>
+      </div>
+
+      {catalogOpen && (
+        <div className="fixed inset-0 z-30 flex items-end sm:items-center justify-center bg-ink/40 p-0 sm:p-4">
+          <div className="flex h-full w-full flex-col bg-canvas sm:h-auto sm:max-h-[85vh] sm:max-w-lg sm:rounded-2xl sm:border sm:border-hairline">
+            <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
+              <h2 className="font-semibold text-ink">품목 카탈로그</h2>
+              <button
+                type="button"
+                onClick={() => setCatalogOpen(false)}
+                aria-label="닫기"
+                className="flex h-11 w-11 items-center justify-center text-muted hover:text-ink"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-3">
+              {QUOTE_CATALOG.map((group) => (
+                <div key={group.category} className="mb-4">
+                  <h3 className="mb-2 text-xs font-semibold text-muted">{group.category}</h3>
+                  <div className="flex flex-col gap-1">
+                    {group.items.map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => addFromCatalog(name)}
+                        className="flex items-center justify-between rounded-xl border border-hairline px-3 py-3 text-left text-sm hover:bg-surface-soft"
+                      >
+                        <span>{name}</span>
+                        {recentlyAdded === name ? (
+                          <span className="text-xs font-medium text-brand-teal">✓ 추가됨</span>
+                        ) : (
+                          <span className="text-lg text-muted">+</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-hairline px-4 py-3">
+              <button
+                type="button"
+                onClick={() => setCatalogOpen(false)}
+                className={buttonPrimaryClass + " w-full sm:w-auto"}
+              >
+                선택 완료 (닫기)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-xs ml-auto flex flex-col gap-1 text-sm">
         <div className="flex justify-between">

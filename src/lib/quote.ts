@@ -80,3 +80,46 @@ export const QUOTE_STATUS_BADGE_CLASS: Record<string, string> = {
   "거절/드롭": "bg-surface-strong text-body",
   미응답: "bg-brand-lavender text-ink",
 };
+
+export const QUOTE_CATALOG: { category: string; items: string[] }[] = [
+  {
+    category: "카메라",
+    items: [
+      "CCTV 카메라 (실내)",
+      "CCTV 카메라 (실외)",
+      "IP 카메라 (실내, PoE)",
+      "IP 카메라 (실외, PoE)",
+      "야간컬러 카메라",
+      "PTZ 스피드돔 카메라",
+    ],
+  },
+  {
+    category: "녹화장비",
+    items: ["DVR 8채널", "DVR 16채널", "NVR 8채널", "NVR 16채널"],
+  },
+  {
+    category: "저장장치",
+    items: ["HDD 2TB", "HDD 4TB"],
+  },
+  {
+    category: "전원/배선",
+    items: ["CCTV 전용케이블", "전원케이블", "전원장치 (SMPS/어댑터)"],
+  },
+  {
+    category: "부자재",
+    items: ["하이박스", "PVC 몰딩", "잡자재 (커넥터/앙카 등)"],
+  },
+  {
+    category: "시공/서비스",
+    items: [
+      "설치 공사비",
+      "노무비",
+      "네트워크 셋팅",
+      "스마트폰 원격 설정",
+      "모니터 벽걸이 설치",
+      "층간 공사 설치비",
+      "엘리베이터 공사",
+      "개인정보보호법 안내판 제공",
+    ],
+  },
+];

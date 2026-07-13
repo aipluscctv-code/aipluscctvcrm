@@ -10,7 +10,7 @@ import { compressImage } from "@/lib/image";
 import { generateJobContent } from "@/lib/ai-content";
 
 const BUCKET = "job-photos";
-const MAX_PHOTOS = 5;
+const MAX_PHOTOS = 15;
 const RETENTION_DAYS = 90;
 
 export async function createJob(formData: FormData) {

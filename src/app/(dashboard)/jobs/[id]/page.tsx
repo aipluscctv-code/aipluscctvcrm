@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CopyTextBox } from "../../quotes/CopyTextBox";
+import { BlogPreview } from "../BlogPreview";
 import { deleteJob, regenerateJobContent } from "../actions";
 import { buttonPrimaryClass, buttonSecondaryClass } from "@/lib/ui";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -100,6 +101,13 @@ export default async function JobDetailPage({
           </div>
           <div>
             <h2 className="font-semibold mb-2">네이버 블로그용</h2>
+            <p className="text-xs text-muted mb-2">
+              사진 배치 미리보기 — 네이버 에디터에 붙여넣을 때 이 순서대로 문단 사이에 사진을
+              끼워 넣으세요. 아래 복사창의 [사진N] 표시가 그 자리를 뜻합니다.
+            </p>
+            <div className="mb-3">
+              <BlogPreview text={content.blog} photoUrls={photoUrls} />
+            </div>
             <CopyTextBox text={content.blog} />
           </div>
         </div>
