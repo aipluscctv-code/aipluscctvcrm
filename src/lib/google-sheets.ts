@@ -32,7 +32,8 @@ export type MonthlySummaryRow = {
 
 export type LedgerEntryRow = {
   date: string;
-  type: string;
+  transactionType: string;
+  category: string;
   counterparty: string;
   area: string;
   phone: string;
@@ -163,23 +164,24 @@ export async function getRecentLedgerEntries(): Promise<LedgerEntryRow[]> {
   const sheets = getSheetsClient();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.LEDGER_SHEET_ID!,
-    range: "거래장부!A4:L999",
+    range: "거래장부!A4:M999",
   });
   const rows = (res.data.values ?? []).filter((r) => r[0]);
   return rows
     .reverse()
     .map((r) => ({
       date: String(r[0] ?? ""),
-      type: String(r[1] ?? ""),
-      counterparty: String(r[2] ?? ""),
-      area: String(r[3] ?? ""),
-      phone: String(r[4] ?? ""),
-      item: String(r[5] ?? ""),
-      supplyAmount: toNumber(r[6]),
-      vat: toNumber(r[7]),
-      totalAmount: toNumber(r[8]),
-      evidenceType: String(r[9] ?? ""),
-      paymentMethod: String(r[10] ?? ""),
-      memo: String(r[11] ?? ""),
+      transactionType: String(r[1] ?? ""),
+      category: String(r[2] ?? ""),
+      counterparty: String(r[3] ?? ""),
+      area: String(r[4] ?? ""),
+      phone: String(r[5] ?? ""),
+      item: String(r[6] ?? ""),
+      supplyAmount: toNumber(r[7]),
+      vat: toNumber(r[8]),
+      totalAmount: toNumber(r[9]),
+      evidenceType: String(r[10] ?? ""),
+      paymentMethod: String(r[11] ?? ""),
+      memo: String(r[12] ?? ""),
     }));
 }

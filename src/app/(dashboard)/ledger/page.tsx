@@ -75,7 +75,7 @@ export default async function LedgerPage({
     <div className="flex flex-col gap-8">
       <h1 className="text-lg font-semibold text-ink">장부 대시보드</h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <SummaryCard
           label={`${thisMonth} 매출`}
           value={current?.revenue ?? 0}
@@ -97,7 +97,17 @@ export default async function LedgerPage({
           suffix="%"
           colorClass={featureCardClasses[3]}
         />
+        <SummaryCard
+          label={`${thisMonth} 4대보험 예비비 추정 (매출×10%)`}
+          value={Math.round((current?.revenue ?? 0) * 0.1)}
+          colorClass={featureCardClasses[4]}
+        />
       </div>
+      <p className="text-xs text-muted -mt-6">
+        4대보험 예비비는 매출의 10%로 보수적으로 어림잡은 값입니다 — 실제 국민연금·건강보험은
+        매출이 아닌 소득(순이익) 기준으로 계산되며 개인 상황에 따라 다르니, 정확한 금액은
+        국민연금공단·건강보험공단 계산기나 세무사 상담으로 확인하세요.
+      </p>
 
       <div className="flex flex-col gap-2">
         <h2 className="font-semibold text-ink">월별 매출 vs 비용</h2>
@@ -138,6 +148,7 @@ export default async function LedgerPage({
             <thead className="bg-surface-card text-left">
               <tr>
                 <th className="px-3 py-2">날짜</th>
+                <th className="px-3 py-2">구분</th>
                 <th className="px-3 py-2">유형</th>
                 <th className="px-3 py-2">상대방</th>
                 <th className="px-3 py-2">품목</th>
@@ -148,7 +159,18 @@ export default async function LedgerPage({
               {pageRows.map((e, i) => (
                 <tr key={i} className="border-t border-hairline">
                   <td className="px-3 py-2 text-muted">{e.date}</td>
-                  <td className="px-3 py-2">{e.type}</td>
+                  <td className="px-3 py-2">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                        e.transactionType === "매출"
+                          ? "bg-brand-mint text-ink"
+                          : "bg-brand-coral text-on-primary"
+                      }`}
+                    >
+                      {e.transactionType || "-"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2">{e.category}</td>
                   <td className="px-3 py-2">{e.counterparty}</td>
                   <td className="px-3 py-2">{e.item}</td>
                   <td className="px-3 py-2">{e.totalAmount.toLocaleString()}원</td>

@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { computeTotals, itemAmount, QUOTE_CATALOG, type QuoteItem } from "@/lib/quote";
+import { KT_PRICE_LIST } from "@/lib/kt-price-list";
 import { inputClass, labelClass, buttonPrimaryClass, buttonSecondaryClass } from "@/lib/ui";
 import { SubmitButton } from "@/components/SubmitButton";
+import { Modal } from "@/components/Modal";
 
 const EMPTY_ITEM: QuoteItem = { name: "", model: "", spec: "", qty: 1, unitPrice: 0 };
 
@@ -18,6 +20,7 @@ export function QuoteItemsForm({
 }) {
   const [items, setItems] = useState<QuoteItem[]>([{ ...EMPTY_ITEM }]);
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [priceListOpen, setPriceListOpen] = useState(false);
   const [recentlyAdded, setRecentlyAdded] = useState<string | null>(null);
   const { subtotal, vat, total } = computeTotals(items);
 
@@ -131,64 +134,90 @@ export function QuoteItemsForm({
         </table>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <button type="button" onClick={addRow} className={buttonSecondaryClass}>
           + 품목 추가
         </button>
         <button type="button" onClick={() => setCatalogOpen(true)} className={buttonSecondaryClass}>
           카탈로그에서 추가
         </button>
+        <button type="button" onClick={() => setPriceListOpen(true)} className={buttonSecondaryClass}>
+          단가표
+        </button>
       </div>
 
       {catalogOpen && (
-        <div className="fixed inset-0 z-30 flex items-end sm:items-center justify-center bg-ink/40 p-0 sm:p-4">
-          <div className="flex h-full w-full flex-col bg-canvas sm:h-auto sm:max-h-[85vh] sm:max-w-lg sm:rounded-2xl sm:border sm:border-hairline">
-            <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-              <h2 className="font-semibold text-ink">품목 카탈로그</h2>
-              <button
-                type="button"
-                onClick={() => setCatalogOpen(false)}
-                aria-label="닫기"
-                className="flex h-11 w-11 items-center justify-center text-muted hover:text-ink"
-              >
-                ✕
-              </button>
+        <Modal
+          title="품목 카탈로그"
+          onClose={() => setCatalogOpen(false)}
+          footer={
+            <button
+              type="button"
+              onClick={() => setCatalogOpen(false)}
+              className={buttonPrimaryClass + " w-full sm:w-auto"}
+            >
+              선택 완료 (닫기)
+            </button>
+          }
+        >
+          {QUOTE_CATALOG.map((group) => (
+            <div key={group.category} className="mb-4">
+              <h3 className="mb-2 text-xs font-semibold text-muted">{group.category}</h3>
+              <div className="flex flex-col gap-1">
+                {group.items.map((name) => (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => addFromCatalog(name)}
+                    className="flex items-center justify-between rounded-xl border border-hairline px-3 py-3 text-left text-sm hover:bg-surface-soft"
+                  >
+                    <span>{name}</span>
+                    {recentlyAdded === name ? (
+                      <span className="text-xs font-medium text-brand-teal">✓ 추가됨</span>
+                    ) : (
+                      <span className="text-lg text-muted">+</span>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 py-3">
-              {QUOTE_CATALOG.map((group) => (
-                <div key={group.category} className="mb-4">
-                  <h3 className="mb-2 text-xs font-semibold text-muted">{group.category}</h3>
-                  <div className="flex flex-col gap-1">
-                    {group.items.map((name) => (
-                      <button
-                        key={name}
-                        type="button"
-                        onClick={() => addFromCatalog(name)}
-                        className="flex items-center justify-between rounded-xl border border-hairline px-3 py-3 text-left text-sm hover:bg-surface-soft"
-                      >
-                        <span>{name}</span>
-                        {recentlyAdded === name ? (
-                          <span className="text-xs font-medium text-brand-teal">✓ 추가됨</span>
-                        ) : (
-                          <span className="text-lg text-muted">+</span>
-                        )}
-                      </button>
-                    ))}
+          ))}
+        </Modal>
+      )}
+
+      {priceListOpen && (
+        <Modal title="KT 단가표 (참고용)" onClose={() => setPriceListOpen(false)}>
+          <p className="mb-3 text-xs text-muted">
+            조회 전용입니다 — 눌러도 견적서에 자동으로 입력되지 않습니다. 항목명/단가는 직접
+            타이핑해서 사용하세요.
+          </p>
+          {KT_PRICE_LIST.map((group) => (
+            <div key={group.category} className="mb-4">
+              <h3 className="mb-2 text-xs font-semibold text-muted">{group.category}</h3>
+              <div className="flex flex-col gap-1">
+                {group.items.map((item) => (
+                  <div
+                    key={item.model}
+                    className="rounded-xl border border-hairline px-3 py-2 text-sm"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-medium">{item.name}</span>
+                      <span className="shrink-0 font-semibold text-ink">
+                        {typeof item.price === "number"
+                          ? `${item.price.toLocaleString()}원`
+                          : item.price}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted">
+                      {item.model}
+                      {item.spec ? ` · ${item.spec}` : ""}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-            <div className="border-t border-hairline px-4 py-3">
-              <button
-                type="button"
-                onClick={() => setCatalogOpen(false)}
-                className={buttonPrimaryClass + " w-full sm:w-auto"}
-              >
-                선택 완료 (닫기)
-              </button>
-            </div>
-          </div>
-        </div>
+          ))}
+        </Modal>
       )}
 
       <div className="max-w-xs ml-auto flex flex-col gap-1 text-sm">

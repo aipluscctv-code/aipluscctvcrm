@@ -61,3 +61,15 @@ export const shortLinks = pgTable("short_links", {
   channelLabel: text("channel_label"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const contacts = pgTable("contacts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  gender: text("gender"),
+  age: integer("age"),
+  region: text("region"),
+  phone: text("phone"),
+  company: text("company"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

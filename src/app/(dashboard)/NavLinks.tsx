@@ -9,6 +9,7 @@ export const NAV_ITEMS = [
   { href: "/jobs", label: "시공사진" },
   { href: "/ledger", label: "장부" },
   { href: "/utm", label: "UTM 분석" },
+  { href: "/db", label: "DB" },
 ];
 
 export function NavLinks() {
