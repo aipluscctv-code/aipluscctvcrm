@@ -53,9 +53,14 @@ export default async function DbPage({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold text-ink">DB</h1>
-        <a href="/db/export" className={buttonPrimaryClass}>
-          엑셀로 내보내기
-        </a>
+        <div className="flex gap-2">
+          <Link href="/db/new" className={buttonSecondaryClass}>
+            + 새 연락처
+          </Link>
+          <a href="/db/export" className={buttonPrimaryClass}>
+            엑셀로 내보내기
+          </a>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-hairline p-4">

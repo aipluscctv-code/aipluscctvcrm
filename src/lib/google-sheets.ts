@@ -18,18 +18,6 @@ export function getSheetsClient() {
   return google.sheets({ version: "v4", auth });
 }
 
-export type MonthlySummaryRow = {
-  month: string;
-  revenue: number;
-  materials: number;
-  labor: number;
-  overhead: number;
-  totalCost: number;
-  profit: number;
-  margin: number;
-  taxReserve: number;
-};
-
 export type LedgerEntryRow = {
   date: string;
   transactionType: string;
@@ -53,28 +41,6 @@ function toNumber(value: unknown) {
     return Number.isFinite(n) ? n : 0;
   }
   return 0;
-}
-
-export async function getLedgerSummary(): Promise<MonthlySummaryRow[]> {
-  const sheets = getSheetsClient();
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: process.env.LEDGER_SHEET_ID!,
-    range: "월별요약!A4:I16",
-  });
-  const rows = res.data.values ?? [];
-  return rows
-    .filter((r) => r[0])
-    .map((r) => ({
-      month: String(r[0] ?? ""),
-      revenue: toNumber(r[1]),
-      materials: toNumber(r[2]),
-      labor: toNumber(r[3]),
-      overhead: toNumber(r[4]),
-      totalCost: toNumber(r[5]),
-      profit: toNumber(r[6]),
-      margin: toNumber(r[7]),
-      taxReserve: toNumber(r[8]),
-    }));
 }
 
 export type ChannelSummaryRow = {

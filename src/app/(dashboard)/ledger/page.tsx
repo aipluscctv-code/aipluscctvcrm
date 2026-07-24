@@ -1,9 +1,19 @@
-import { getLedgerSummary, getRecentLedgerEntries } from "@/lib/google-sheets";
+import Link from "next/link";
+import { getRecentLedgerEntries } from "@/lib/google-sheets";
+import { getAvailableYears, getMonthlySummary, getYearlySummary } from "@/lib/ledger-summary";
 import { featureCardClasses } from "@/lib/ui";
 import { Pagination } from "@/components/Pagination";
 import { parsePagination, paginate, type ListSearchParams } from "@/lib/list-query";
 
 const LEDGER_PAGE_SIZE_OPTIONS = [10, 25, 50, 100] as const;
+
+function currentYear() {
+  return Number(
+    new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Seoul", year: "numeric" }).format(
+      new Date(),
+    ),
+  );
+}
 
 function currentMonthLabel() {
   const monthNumber = Number(
@@ -13,6 +23,11 @@ function currentMonthLabel() {
   );
   return `${monthNumber}월`;
 }
+
+const tabClass = (active: boolean) =>
+  active
+    ? "rounded-full bg-ink px-4 py-2 text-sm font-semibold text-on-primary"
+    : "rounded-full px-4 py-2 text-sm text-muted hover:text-ink";
 
 function SummaryCard({
   label,
@@ -36,18 +51,29 @@ function SummaryCard({
   );
 }
 
+type LedgerSearchParams = ListSearchParams & { view?: string; year?: string };
+
+function buildLedgerHref(params: LedgerSearchParams, overrides: Partial<LedgerSearchParams>) {
+  const next = new URLSearchParams();
+  const merged = { ...params, ...overrides };
+  for (const [key, value] of Object.entries(merged)) {
+    if (value && key !== "page" && key !== "pageSize") next.set(key, value);
+  }
+  const qs = next.toString();
+  return qs ? `/ledger?${qs}` : "/ledger";
+}
+
 export default async function LedgerPage({
   searchParams,
 }: {
-  searchParams: Promise<ListSearchParams>;
+  searchParams: Promise<LedgerSearchParams>;
 }) {
   const params = await searchParams;
-  let summary: Awaited<ReturnType<typeof getLedgerSummary>> = [];
   let recentEntries: Awaited<ReturnType<typeof getRecentLedgerEntries>> = [];
   let error: string | null = null;
 
   try {
-    [summary, recentEntries] = await Promise.all([getLedgerSummary(), getRecentLedgerEntries()]);
+    recentEntries = await getRecentLedgerEntries();
   } catch (e) {
     error = e instanceof Error ? e.message : "장부 Sheet를 불러오지 못했습니다";
   }
@@ -64,41 +90,73 @@ export default async function LedgerPage({
     );
   }
 
-  const thisMonth = currentMonthLabel();
-  const current = summary.find((s) => s.month === thisMonth);
-  const maxValue = Math.max(1, ...summary.map((s) => Math.max(s.revenue, s.totalCost)));
+  const view = params.view === "year" ? "year" : "month";
+  const availableYears = getAvailableYears(recentEntries);
+  const selectedYear = availableYears.includes(Number(params.year))
+    ? Number(params.year)
+    : availableYears[0] ?? currentYear();
+
+  const periods = view === "year" ? getYearlySummary(recentEntries) : getMonthlySummary(recentEntries, selectedYear);
+  const currentLabel = view === "year" ? `${selectedYear}년` : currentMonthLabel();
+  const current = periods.find((p) => p.label === currentLabel) ?? periods[periods.length - 1];
+  const maxValue = Math.max(1, ...periods.map((p) => Math.max(p.revenue, p.totalCost)));
 
   const { page, pageSize } = parsePagination(params, LEDGER_PAGE_SIZE_OPTIONS);
   const { pageRows, totalPages } = paginate(recentEntries, page, pageSize);
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-lg font-semibold text-ink">장부 대시보드</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-lg font-semibold text-ink">장부 대시보드</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1 rounded-full bg-surface-card p-1">
+            <Link href={buildLedgerHref(params, { view: "month" })} className={tabClass(view === "month")}>
+              월별
+            </Link>
+            <Link href={buildLedgerHref(params, { view: "year" })} className={tabClass(view === "year")}>
+              연도별
+            </Link>
+          </div>
+          {view === "month" && availableYears.length > 0 && (
+            <div className="flex items-center gap-1">
+              {availableYears.map((year) => (
+                <Link
+                  key={year}
+                  href={buildLedgerHref(params, { view: "month", year: String(year) })}
+                  className={tabClass(year === selectedYear)}
+                >
+                  {year}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <SummaryCard
-          label={`${thisMonth} 매출`}
+          label={`${currentLabel} 매출`}
           value={current?.revenue ?? 0}
           colorClass={featureCardClasses[0]}
         />
         <SummaryCard
-          label={`${thisMonth} 총비용`}
+          label={`${currentLabel} 총비용`}
           value={current?.totalCost ?? 0}
           colorClass={featureCardClasses[1]}
         />
         <SummaryCard
-          label={`${thisMonth} 순이익`}
+          label={`${currentLabel} 순이익`}
           value={current?.profit ?? 0}
           colorClass={featureCardClasses[2]}
         />
         <SummaryCard
-          label={`${thisMonth} 이익률`}
+          label={`${currentLabel} 이익률`}
           value={Math.round((current?.margin ?? 0) * 1000) / 10}
           suffix="%"
           colorClass={featureCardClasses[3]}
         />
         <SummaryCard
-          label={`${thisMonth} 4대보험 예비비 추정 (매출×10%)`}
+          label={`${currentLabel} 4대보험 예비비 추정 (매출×10%)`}
           value={Math.round((current?.revenue ?? 0) * 0.1)}
           colorClass={featureCardClasses[4]}
         />
@@ -110,27 +168,29 @@ export default async function LedgerPage({
       </p>
 
       <div className="flex flex-col gap-2">
-        <h2 className="font-semibold text-ink">월별 매출 vs 비용</h2>
+        <h2 className="font-semibold text-ink">
+          {view === "year" ? "연도별 매출 vs 비용" : `${selectedYear}년 월별 매출 vs 비용`}
+        </h2>
         <div className="flex flex-col gap-2 rounded-2xl border border-hairline p-4">
-          {summary.map((s) => (
-            <div key={s.month} className="flex items-center gap-3 text-xs">
-              <span className="w-8 text-muted">{s.month}</span>
+          {periods.map((p) => (
+            <div key={p.label} className="flex items-center gap-3 text-xs">
+              <span className="w-10 text-muted">{p.label}</span>
               <div className="flex-1 flex flex-col gap-1">
                 <div className="h-3 bg-surface-card rounded-full">
                   <div
                     className="h-3 rounded-full bg-brand-mint"
-                    style={{ width: `${(s.revenue / maxValue) * 100}%` }}
+                    style={{ width: `${(p.revenue / maxValue) * 100}%` }}
                   />
                 </div>
                 <div className="h-3 bg-surface-card rounded-full">
                   <div
                     className="h-3 rounded-full bg-brand-coral"
-                    style={{ width: `${(s.totalCost / maxValue) * 100}%` }}
+                    style={{ width: `${(p.totalCost / maxValue) * 100}%` }}
                   />
                 </div>
               </div>
               <span className="w-24 text-right text-muted">
-                {s.revenue.toLocaleString()} / {s.totalCost.toLocaleString()}
+                {p.revenue.toLocaleString()} / {p.totalCost.toLocaleString()}
               </span>
             </div>
           ))}

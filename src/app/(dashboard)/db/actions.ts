@@ -83,6 +83,30 @@ export async function importContacts(formData: FormData) {
   revalidatePath("/db");
 }
 
+export async function createContact(formData: FormData) {
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) {
+    throw new Error("이름은 필수입니다");
+  }
+  const ageRaw = String(formData.get("age") ?? "").trim();
+  const field = (key: string) => {
+    const v = String(formData.get(key) ?? "").trim();
+    return v || null;
+  };
+
+  await db.insert(contacts).values({
+    name,
+    gender: field("gender"),
+    age: ageRaw ? Number(ageRaw) || null : null,
+    region: field("region"),
+    phone: field("phone"),
+    company: field("company"),
+    notes: field("notes"),
+  });
+  revalidatePath("/db");
+  redirect("/db");
+}
+
 export async function deleteContact(id: string) {
   await db.delete(contacts).where(eq(contacts.id, id));
   revalidatePath("/db");
