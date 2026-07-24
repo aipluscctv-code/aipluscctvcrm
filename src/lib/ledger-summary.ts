@@ -8,7 +8,7 @@ export type PeriodSummary = {
   margin: number;
 };
 
-function parseYearMonth(dateStr: string): { year: number; month: number } | null {
+export function parseYearMonth(dateStr: string): { year: number; month: number } | null {
   const m = dateStr.match(/^(\d{4})-(\d{2})/);
   if (!m) return null;
   return { year: Number(m[1]), month: Number(m[2]) };
@@ -42,12 +42,5 @@ export function getMonthlySummary(entries: LedgerEntryRow[], year: number): Peri
       return parsed && parsed.year === year && parsed.month === month;
     });
     return toPeriodSummary(`${month}월`, rows);
-  });
-}
-
-export function getYearlySummary(entries: LedgerEntryRow[]): PeriodSummary[] {
-  return getAvailableYears(entries).map((year) => {
-    const rows = entries.filter((e) => parseYearMonth(e.date)?.year === year);
-    return toPeriodSummary(`${year}년`, rows);
   });
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getRecentLedgerEntries } from "@/lib/google-sheets";
-import { getAvailableYears, getMonthlySummary, getYearlySummary } from "@/lib/ledger-summary";
+import { getAvailableYears, getMonthlySummary, parseYearMonth } from "@/lib/ledger-summary";
 import { featureCardClasses } from "@/lib/ui";
 import { Pagination } from "@/components/Pagination";
 import { parsePagination, paginate, type ListSearchParams } from "@/lib/list-query";
@@ -51,7 +51,7 @@ function SummaryCard({
   );
 }
 
-type LedgerSearchParams = ListSearchParams & { view?: string; year?: string };
+type LedgerSearchParams = ListSearchParams & { year?: string; month?: string };
 
 function buildLedgerHref(params: LedgerSearchParams, overrides: Partial<LedgerSearchParams>) {
   const next = new URLSearchParams();
@@ -90,47 +90,64 @@ export default async function LedgerPage({
     );
   }
 
-  const view = params.view === "year" ? "year" : "month";
   const availableYears = getAvailableYears(recentEntries);
   const selectedYear = availableYears.includes(Number(params.year))
     ? Number(params.year)
     : availableYears[0] ?? currentYear();
+  const selectedMonth =
+    params.month && Number(params.month) >= 1 && Number(params.month) <= 12
+      ? Number(params.month)
+      : null;
 
-  const periods = view === "year" ? getYearlySummary(recentEntries) : getMonthlySummary(recentEntries, selectedYear);
-  const currentLabel = view === "year" ? `${selectedYear}년` : currentMonthLabel();
-  const current = periods.find((p) => p.label === currentLabel) ?? periods[periods.length - 1];
+  const periods = getMonthlySummary(recentEntries, selectedYear);
+  const currentLabel = selectedMonth ? `${selectedYear}년 ${selectedMonth}월` : currentMonthLabel();
+  const current = selectedMonth
+    ? periods.find((p) => p.label === `${selectedMonth}월`)
+    : (periods.find((p) => p.label === currentLabel) ?? periods[periods.length - 1]);
   const maxValue = Math.max(1, ...periods.map((p) => Math.max(p.revenue, p.totalCost)));
 
+  const filteredEntries = selectedMonth
+    ? recentEntries.filter((e) => {
+        const parsed = parseYearMonth(e.date);
+        return parsed && parsed.year === selectedYear && parsed.month === selectedMonth;
+      })
+    : recentEntries;
+
   const { page, pageSize } = parsePagination(params, LEDGER_PAGE_SIZE_OPTIONS);
-  const { pageRows, totalPages } = paginate(recentEntries, page, pageSize);
+  const { pageRows, totalPages } = paginate(filteredEntries, page, pageSize);
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-lg font-semibold text-ink">장부 대시보드</h1>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 rounded-full bg-surface-card p-1">
-            <Link href={buildLedgerHref(params, { view: "month" })} className={tabClass(view === "month")}>
-              월별
-            </Link>
-            <Link href={buildLedgerHref(params, { view: "year" })} className={tabClass(view === "year")}>
-              연도별
-            </Link>
+        {availableYears.length > 0 && (
+          <div className="flex items-center gap-1">
+            {availableYears.map((year) => (
+              <Link
+                key={year}
+                href={buildLedgerHref(params, { year: String(year), month: undefined })}
+                className={tabClass(year === selectedYear)}
+              >
+                {year}
+              </Link>
+            ))}
           </div>
-          {view === "month" && availableYears.length > 0 && (
-            <div className="flex items-center gap-1">
-              {availableYears.map((year) => (
-                <Link
-                  key={year}
-                  href={buildLedgerHref(params, { view: "month", year: String(year) })}
-                  className={tabClass(year === selectedYear)}
-                >
-                  {year}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1">
+        <Link href={buildLedgerHref(params, { month: undefined })} className={tabClass(!selectedMonth)}>
+          전체
+        </Link>
+        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+          <Link
+            key={month}
+            href={buildLedgerHref(params, { month: String(month) })}
+            className={tabClass(selectedMonth === month)}
+          >
+            {month}월
+          </Link>
+        ))}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -168,12 +185,16 @@ export default async function LedgerPage({
       </p>
 
       <div className="flex flex-col gap-2">
-        <h2 className="font-semibold text-ink">
-          {view === "year" ? "연도별 매출 vs 비용" : `${selectedYear}년 월별 매출 vs 비용`}
-        </h2>
+        <h2 className="font-semibold text-ink">{selectedYear}년 월별 매출 vs 비용</h2>
         <div className="flex flex-col gap-2 rounded-2xl border border-hairline p-4">
-          {periods.map((p) => (
-            <div key={p.label} className="flex items-center gap-3 text-xs">
+          {periods.map((p, i) => (
+            <Link
+              key={p.label}
+              href={buildLedgerHref(params, { month: String(i + 1) })}
+              className={`flex items-center gap-3 text-xs rounded-lg px-2 py-1 -mx-2 ${
+                selectedMonth === i + 1 ? "bg-surface-card" : "hover:bg-surface-card/60"
+              }`}
+            >
               <span className="w-10 text-muted">{p.label}</span>
               <div className="flex-1 flex flex-col gap-1">
                 <div className="h-3 bg-surface-card rounded-full">
@@ -192,17 +213,19 @@ export default async function LedgerPage({
               <span className="w-24 text-right text-muted">
                 {p.revenue.toLocaleString()} / {p.totalCost.toLocaleString()}
               </span>
-            </div>
+            </Link>
           ))}
         </div>
         <p className="text-xs text-muted">
           <span className="text-brand-mint">■</span> 매출 &nbsp;
-          <span className="text-brand-coral">■</span> 비용
+          <span className="text-brand-coral">■</span> 비용 &nbsp;· 월을 클릭하면 아래 거래 내역이 해당 월로 필터링됩니다
         </p>
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="font-semibold text-ink">최근 거래 내역</h2>
+        <h2 className="font-semibold text-ink">
+          {selectedMonth ? `${selectedYear}년 ${selectedMonth}월 거래 내역` : "최근 거래 내역"}
+        </h2>
         <div className="overflow-x-auto rounded-2xl border border-hairline">
           <table className="w-full text-sm">
             <thead className="bg-surface-card text-left">
@@ -239,7 +262,12 @@ export default async function LedgerPage({
             </tbody>
           </table>
         </div>
-        {recentEntries.length > 0 && (
+        {filteredEntries.length === 0 && (
+          <p className="text-sm text-muted">
+            {selectedMonth ? "해당 월의 거래 내역이 없습니다." : "거래 내역이 없습니다."}
+          </p>
+        )}
+        {filteredEntries.length > 0 && (
           <Pagination
             page={page}
             totalPages={totalPages}
